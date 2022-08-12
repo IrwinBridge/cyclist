@@ -1,7 +1,9 @@
+require('dotenv').config()
+const getenv = require('getenv');
 const { spawn } = require('child_process');
 const { checkReportExists, checkTestPassed } = require('./utils');
 
-const E2E_FOLDER = '/Users/oleg/work/lms-e2e';
+const CY_E2E_FOLDER = getenv.string('CY_E2E_FOLDER');
 
 const workers = [];
 
@@ -23,7 +25,7 @@ const testcafe = async (test) => {
       ['testcafe-runner.sh'],
       {
         env: { ...process.env, E2E_FILTER: testFilter },
-        cwd: E2E_FOLDER,
+        cwd: CY_E2E_FOLDER,
       },
     );
     testcafe.stdout.on('data', data => {

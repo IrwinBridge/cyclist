@@ -1,8 +1,11 @@
-const { readdir, access, writeFile, readFile, unlink } = require('fs').promises;
+require('dotenv').config()
+const getenv = require('getenv');
+const { readdir, access, writeFile, readFile, unlink, rmdir } = require('fs').promises;
 
-const TESTS_DIR = '/Users/oleg/work/lms-e2e/tests';
-const REPORTS_DIR = '/Users/oleg/work/e2e-folders/e2e_reports/NA'
-const OUTPUT = '/Users/oleg/pets/cycle-test/output.json';
+const CY_TESTS_DIR = getenv.string('CY_TESTS_DIR');
+const CY_REPORTS_DIR = getenv.string('CY_REPORTS_DIR');
+const CY_OUTPUT = getenv.string('CY_OUTPUT');
+const CY_DOWNLOADS_DIR = getenv.string('CY_DOWNLOADS_DIR');
 
 const fileExists = async (path) => {
   try {
@@ -14,30 +17,30 @@ const fileExists = async (path) => {
 };
 
 const getTests = async () => {
-  const dirContent = await readdir(TESTS_DIR);
+  const dirContent = await readdir(CY_TESTS_DIR);
   return dirContent.filter(entry => entry.includes('.test.js'));
 };
 
 const writeJson = async (object) => {
   const content = JSON.stringify(object, null, '\t');
-  await writeFile(OUTPUT, content);
+  await writeFile(CY_OUTPUT, content);
 };
 
 const upsertTestStatus = async (testname, status) => {
-  const content = await readFile(OUTPUT);
+  const content = await readFile(CY_OUTPUT);
   const testsObj = JSON.parse(content);
   testsObj[testname] = status;
   await writeJson(testsObj);
 };
 
 const checkReportExists = async (test) => {
-  const path = `${REPORTS_DIR}/${test}.json`;
+  const path = `${CY_REPORTS_DIR}/${test}.json`;
   const reportExists = await fileExists(path);
   return reportExists;
 };
 
 const checkTestPassed = async (test) => {
-  const path = `${REPORTS_DIR}/${test}.json`;
+  const path = `${CY_REPORTS_DIR}/${test}.json`;
   const reportExists = await fileExists(path);
   if (!reportExists) return false;
   const content = await readFile(path);
@@ -46,7 +49,7 @@ const checkTestPassed = async (test) => {
 };
 
 const getReports = async () => {
-  const dirContent = await readdir(REPORTS_DIR);
+  const dirContent = await readdir(CY_REPORTS_DIR);
   return dirContent.filter(entry => entry.includes('.json'));
 };
 
@@ -56,9 +59,13 @@ const cleanErrorReports = async () => {
     const testName = reports[i].replace('.json', '');
     const hasTestPassed = await checkTestPassed(testName);
     if (!hasTestPassed) {
-      await unlink(`${REPORTS_DIR}/${reports[i]}`);
+      await unlink(`${CY_REPORTS_DIR}/${reports[i]}`);
     }
   }
+};
+
+const cleanDownloadsFolder = async () => {
+  await rmdir(CY_DOWNLOADS_DIR, { recursive: true });
 };
 
 module.exports = {
@@ -68,5 +75,6 @@ module.exports = {
   upsertTestStatus,
   checkReportExists,
   checkTestPassed,
-  cleanErrorReports
+  cleanErrorReports,
+  cleanDownloadsFolder
 };

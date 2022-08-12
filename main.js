@@ -3,7 +3,8 @@ const {
   writeJson,
   upsertTestStatus,
   checkTestPassed,
-  cleanErrorReports
+  cleanErrorReports,
+  cleanDownloadsFolder
 } = require('./utils');
 const { run } = require('./runner');
 
@@ -11,6 +12,7 @@ const options = process.argv.slice(2);
 const shouldStartFresh = options.includes('fresh');
 
 (async () => {
+  await cleanDownloadsFolder();
   if (shouldStartFresh) {
     await cleanErrorReports();
   }
