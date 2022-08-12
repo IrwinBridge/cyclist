@@ -1,9 +1,0 @@
-{
-	"access-to-request-completed-files.test.js": "PASSED",
-	"accounting-connector.test.js": "PASSED",
-	"acct-invoice-creation-local-amount-not-shown-as-rounded-in-export-file.test.js": "PASSED",
-	"acct-invoice-creation-with-invalid-total-amount.test.js": "ERROR",
-	"activate-user-after-password-reset.test.js": "PASSED",
-	"activities.part1.test.js": "ERROR",
-	"activities.part2.test.js": "PENDING"
-}
